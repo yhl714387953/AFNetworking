@@ -50,25 +50,25 @@
     if (!self) {
         return nil;
     }
-
+    
     // Ensure terminal slash for baseURL path, so that NSURL +URLWithString:relativeToURL: works as expected
     if ([[url path] length] > 0 && ![[url absoluteString] hasSuffix:@"/"]) {
         url = [url URLByAppendingPathComponent:@""];
     }
-
+    
     self.baseURL = url;
-
+    
     self.requestSerializer = [AFHTTPRequestSerializer serializer];
     self.responseSerializer = [AFJSONResponseSerializer serializer];
-
+    
     self.securityPolicy = [AFSecurityPolicy defaultPolicy];
-
+    
     self.reachabilityManager = [AFNetworkReachabilityManager sharedManager];
-
+    
     self.operationQueue = [[NSOperationQueue alloc] init];
-
+    
     self.shouldUseCredentialStorage = YES;
-
+    
     return self;
 }
 
@@ -79,13 +79,13 @@
 
 - (void)setRequestSerializer:(AFHTTPRequestSerializer <AFURLRequestSerialization> *)requestSerializer {
     NSParameterAssert(requestSerializer);
-
+    
     _requestSerializer = requestSerializer;
 }
 
 - (void)setResponseSerializer:(AFHTTPResponseSerializer <AFURLResponseSerialization> *)responseSerializer {
     NSParameterAssert(responseSerializer);
-
+    
     _responseSerializer = responseSerializer;
 }
 
@@ -108,10 +108,10 @@
             });
 #pragma clang diagnostic pop
         }
-
+        
         return nil;
     }
-
+    
     return [self HTTPRequestOperationWithRequest:request success:success failure:failure];
 }
 
@@ -124,11 +124,11 @@
     operation.shouldUseCredentialStorage = self.shouldUseCredentialStorage;
     operation.credential = self.credential;
     operation.securityPolicy = self.securityPolicy;
-
+    
     [operation setCompletionBlockWithSuccess:success failure:failure];
     operation.completionQueue = self.completionQueue;
     operation.completionGroup = self.completionGroup;
-
+    
     return operation;
 }
 
@@ -140,9 +140,9 @@
                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithHTTPMethod:@"GET" URLString:URLString parameters:parameters success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
 
@@ -156,9 +156,9 @@
             success(requestOperation);
         }
     } failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
 
@@ -168,9 +168,9 @@
                          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithHTTPMethod:@"POST" URLString:URLString parameters:parameters success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
 
@@ -191,14 +191,14 @@
             });
 #pragma clang diagnostic pop
         }
-
+        
         return nil;
     }
-
+    
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
 
@@ -208,11 +208,40 @@
                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithHTTPMethod:@"PUT" URLString:URLString parameters:parameters success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
+
+- (AFHTTPRequestOperation *)PUT:(NSString *)URLString
+                     parameters:(id)parameters
+      constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    NSError *serializationError = nil;
+    NSMutableURLRequest *request = [self.requestSerializer multipartFormRequestWithMethod:@"PUT" URLString:[[NSURL URLWithString:URLString relativeToURL:self.baseURL] absoluteString] parameters:parameters constructingBodyWithBlock:block error:&serializationError];
+    if (serializationError) {
+        if (failure) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu"
+            dispatch_async(self.completionQueue ?: dispatch_get_main_queue(), ^{
+                failure(nil, serializationError);
+            });
+#pragma clang diagnostic pop
+        }
+        
+        return nil;
+    }
+    
+    AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
+    
+    [self.operationQueue addOperation:operation];
+    
+    return operation;
+}
+
 
 - (AFHTTPRequestOperation *)PATCH:(NSString *)URLString
                        parameters:(id)parameters
@@ -220,11 +249,40 @@
                           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithHTTPMethod:@"PATCH" URLString:URLString parameters:parameters success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
+
+- (AFHTTPRequestOperation *)PATCH:(NSString *)URLString
+                       parameters:(id)parameters
+        constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    NSError *serializationError = nil;
+    NSMutableURLRequest *request = [self.requestSerializer multipartFormRequestWithMethod:@"PATCH" URLString:[[NSURL URLWithString:URLString relativeToURL:self.baseURL] absoluteString] parameters:parameters constructingBodyWithBlock:block error:&serializationError];
+    if (serializationError) {
+        if (failure) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu"
+            dispatch_async(self.completionQueue ?: dispatch_get_main_queue(), ^{
+                failure(nil, serializationError);
+            });
+#pragma clang diagnostic pop
+        }
+        
+        return nil;
+    }
+    
+    AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
+    
+    [self.operationQueue addOperation:operation];
+    
+    return operation;
+}
+
 
 - (AFHTTPRequestOperation *)DELETE:(NSString *)URLString
                         parameters:(id)parameters
@@ -232,11 +290,40 @@
                            failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithHTTPMethod:@"DELETE" URLString:URLString parameters:parameters success:success failure:failure];
-
+    
     [self.operationQueue addOperation:operation];
-
+    
     return operation;
 }
+
+- (AFHTTPRequestOperation *)DELETE:(NSString *)URLString
+                        parameters:(id)parameters
+         constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
+{
+    NSError *serializationError = nil;
+    NSMutableURLRequest *request = [self.requestSerializer multipartFormRequestWithMethod:@"DELETE" URLString:[[NSURL URLWithString:URLString relativeToURL:self.baseURL] absoluteString] parameters:parameters constructingBodyWithBlock:block error:&serializationError];
+    if (serializationError) {
+        if (failure) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wgnu"
+            dispatch_async(self.completionQueue ?: dispatch_get_main_queue(), ^{
+                failure(nil, serializationError);
+            });
+#pragma clang diagnostic pop
+        }
+        
+        return nil;
+    }
+    
+    AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
+    
+    [self.operationQueue addOperation:operation];
+    
+    return operation;
+}
+
 
 #pragma mark - NSObject
 
@@ -252,19 +339,19 @@
 
 - (id)initWithCoder:(NSCoder *)decoder {
     NSURL *baseURL = [decoder decodeObjectForKey:NSStringFromSelector(@selector(baseURL))];
-
+    
     self = [self initWithBaseURL:baseURL];
     if (!self) {
         return nil;
     }
-
+    
     self.requestSerializer = [decoder decodeObjectOfClass:[AFHTTPRequestSerializer class] forKey:NSStringFromSelector(@selector(requestSerializer))];
     self.responseSerializer = [decoder decodeObjectOfClass:[AFHTTPResponseSerializer class] forKey:NSStringFromSelector(@selector(responseSerializer))];
     AFSecurityPolicy *decodedPolicy = [decoder decodeObjectOfClass:[AFSecurityPolicy class] forKey:NSStringFromSelector(@selector(securityPolicy))];
     if (decodedPolicy) {
         self.securityPolicy = decodedPolicy;
     }
-
+    
     return self;
 }
 
@@ -279,11 +366,11 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     AFHTTPRequestOperationManager *HTTPClient = [[[self class] allocWithZone:zone] initWithBaseURL:self.baseURL];
-
+    
     HTTPClient.requestSerializer = [self.requestSerializer copyWithZone:zone];
     HTTPClient.responseSerializer = [self.responseSerializer copyWithZone:zone];
     HTTPClient.securityPolicy = [self.securityPolicy copyWithZone:zone];
-
+    
     return HTTPClient;
 }
 

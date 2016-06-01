@@ -321,6 +321,25 @@ NS_ASSUME_NONNULL_BEGIN
                            success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                            failure:(nullable void (^)(AFHTTPRequestOperation * __nullable operation, NSError *error))failure;
 
+//2015-11-20 添加方法,允许put delete patch请求带NSData类型的参数
+- (AFHTTPRequestOperation *)PUT:(NSString *)URLString
+                     parameters:(id)parameters
+      constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+- (AFHTTPRequestOperation *)PATCH:(NSString *)URLString
+                       parameters:(id)parameters
+        constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
+- (AFHTTPRequestOperation *)DELETE:(NSString *)URLString
+                        parameters:(id)parameters
+         constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
+                           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+
 @end
 
 NS_ASSUME_NONNULL_END
